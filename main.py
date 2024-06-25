@@ -1,12 +1,15 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, url_for
 from flask_cors import CORS
-from config import MONGODB_URL, SECRET_KEY, POSTGRESQL_URL
+from config import MONGODB_URL, SECRET_KEY, POSTGRESQL_URL, API_URL
 from database import db_session
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta
+from models import UserDatabase
+from sqlalchemy import and_
+from flask_jwt_extended import current_user, jwt_required, get_jwt
 from utils import (
     handle_404,
     handle_415,
@@ -63,6 +66,43 @@ async def shutdown_session(exception=None):
 @app.teardown_request
 async def checkin_db(exception=None):
     db_session.remove()
+
+
+@auth_controller.jwt.user_identity_loader
+def user_identity_lookup(user):
+    return user.id
+
+
+@auth_controller.jwt.user_lookup_loader
+def user_lookup_callback(_jwt_header, jwt_data):
+    identity = jwt_data["sub"]
+    return UserDatabase.query.filter(
+        and_(UserDatabase.id == identity, UserDatabase.is_active == True)
+    ).one_or_none()
+
+
+@auth_controller.jwt.additional_claims_loader
+def add_claims_to_access_token(identity):
+    return {
+        "username": identity.username,
+        "email": identity.email,
+        "profile_image": f'{API_URL}{url_for(
+                                    "api user.get_avatar",
+                                    user_id=identity.id,
+                                    profile_name=identity.profile_name,
+                                )}',
+    }
+
+
+@app.route("/who_am_i", methods=["GET"])
+@jwt_required()
+async def protected():
+    claims = get_jwt()
+    print(claims)
+    return jsonify(
+        id=current_user.id,
+        username=current_user.username,
+    )
 
 
 app.register_blueprint(auth_router)

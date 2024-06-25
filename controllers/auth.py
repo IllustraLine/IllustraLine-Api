@@ -547,30 +547,8 @@ class AuthController:
                 )
             try:
                 if self.bcrypt.check_password_hash(user.password, password):
-                    access_token = create_access_token(
-                        identity=user,
-                        additional_claims={
-                            "username": user.username,
-                            "email": user.email,
-                            "profile_image": f'{API_URL}{url_for(
-                                    "api user.get_avatar",
-                                    user_id=user.id,
-                                    profile_name=user.profile_name,
-                                )}',
-                        },
-                    )
-                    refresh_token = create_refresh_token(
-                        identity=user,
-                        additional_claims={
-                            "username": user.username,
-                            "email": user.email,
-                            "profile_image": f'{API_URL}{url_for(
-                                    "api user.get_avatar",
-                                    user_id=user.id,
-                                    profile_name=user.profile_name,
-                                )}',
-                        },
-                    )
+                    access_token = create_access_token(identity=user)
+                    refresh_token = create_refresh_token(identity=user)
                     return (
                         jsonify(
                             {

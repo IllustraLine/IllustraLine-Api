@@ -1,6 +1,6 @@
-from flask import Flask, jsonify, url_for
+from flask import Flask, jsonify
 from flask_cors import CORS
-from config import MONGODB_URL, SECRET_KEY, POSTGRESQL_URL, API_URL
+from config import MONGODB_URL, SECRET_KEY, POSTGRESQL_URL
 from database import db_session
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address

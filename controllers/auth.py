@@ -133,7 +133,7 @@ class AuthController:
                     f"""<h1>Hi, Welcome {email}</h1>
 
     <p>Di Sini Kami Telah Mengirimkan Anda Untuk Verif Account: </p>
-    <a href={API_URL}/ez-link/v1/user/email-verify/{token}>Click Ini Untuk Verify Email</a>
+    <a href={API_URL}/illustra-line/v1/user/email-verify/{token}>Click Ini Untuk Verify Email</a>
     """,
                     "html",
                 )
@@ -175,7 +175,7 @@ class AuthController:
                                     "email": email,
                                     "user_id": user.id,
                                     "username": user.username,
-                                    "link": f"{API_URL}/ez-link/v1/user/email-verify/{token}",
+                                    "link": f"{API_URL}/illustra-line/v1/user/email-verify/{token}",
                                 },
                                 "errors": None,
                             }
@@ -350,7 +350,7 @@ class AuthController:
                 f"""<h1>Hi, Welcome {email}</h1>
 
     <p>Di Sini Kami Telah Mengirimkan Anda Untuk Merubah Password Anda: </p>
-    <a href={API_URL}/ez-link/v1/user/reset/reset-password/{token}>Click Ini Untuk Reset Password</a>
+    <a href={API_URL}/illustra-line/v1/user/reset/reset-password/{token}>Click Ini Untuk Reset Password</a>
     """,
                 "html",
             )

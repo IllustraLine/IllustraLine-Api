@@ -548,7 +548,7 @@ class AuthController:
             try:
                 if self.bcrypt.check_password_hash(user.password, password):
                     access_token = create_access_token(
-                        identity=user.id,
+                        identity=user,
                         additional_claims={
                             "username": user.username,
                             "email": user.email,
@@ -560,7 +560,7 @@ class AuthController:
                         },
                     )
                     refresh_token = create_refresh_token(
-                        identity=user.id,
+                        identity=user,
                         additional_claims={
                             "username": user.username,
                             "email": user.email,

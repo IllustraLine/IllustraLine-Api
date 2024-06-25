@@ -16,25 +16,29 @@ from utils import (
     handle_403,
     handle_405,
 )
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from api.auth import auth_router, auth_controller
 from api.google_oauth import google_oauth_router, google_oauth_controller
 from api.discord_oauth import discord_oauth_router
 from api.email import email_router
 from api.user import user_router
 
+
 app = Flask(__name__)
 
+
 CORS(app, supports_credentials=True)
+
 
 app.config["SQLALCHEMY_DATABASE_URI"] = POSTGRESQL_URL
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
 app.config["JWT_SECRET_KEY"] = SECRET_KEY
 
+
 google_oauth_controller.google_oauth.init_app(app)
 auth_controller.bcrypt.init_app(app)
 auth_controller.jwt.init_app(app)
+
 
 limiter = Limiter(
     get_remote_address, app=app, default_limits=[""], storage_uri=MONGODB_URL
@@ -66,6 +70,7 @@ app.register_blueprint(google_oauth_router)
 app.register_blueprint(discord_oauth_router)
 app.register_blueprint(email_router)
 app.register_blueprint(user_router)
+
 
 app.register_error_handler(429, handle_429)
 app.register_error_handler(404, handle_404)

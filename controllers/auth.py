@@ -8,7 +8,11 @@ from utils import (
     AccountActive,
 )
 from config import API_URL
-from flask_jwt_extended import create_access_token, create_refresh_token
+from flask_jwt_extended import (
+    create_access_token,
+    create_refresh_token,
+    get_jwt_identity,
+)
 from flask_jwt_extended import JWTManager
 from database import UserCRUD
 from flask_bcrypt import Bcrypt
@@ -33,6 +37,22 @@ class AuthController:
         self.user_database = UserCRUD()
         self.bcrypt = Bcrypt()
         self.jwt = JWTManager()
+
+    async def refresh_token(self):
+        identity = get_jwt_identity()
+        access_token = create_access_token(identity=identity)
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "status_code": 201,
+                    "message": "success create new access token",
+                    "data": {"token": access_token},
+                    "errors": None,
+                }
+            ),
+            201,
+        )
 
     async def email_verify(self, email):
         if not email or email.isspace():

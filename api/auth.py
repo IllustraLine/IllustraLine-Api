@@ -1,8 +1,15 @@
 from flask import Blueprint, request
 from controllers import AuthController
+from flask_jwt_extended import jwt_required
 
 auth_router = Blueprint("api user login", __name__)
 auth_controller = AuthController()
+
+
+@auth_router.post("/ez-link/v1/auth/refresh-token")
+@jwt_required(refresh=True)
+async def refresh_token():
+    return await auth_controller.refresh_token()
 
 
 @auth_router.get("/ez-link/v1/auth/email-verify/<string:token>")

@@ -9,7 +9,6 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import timedelta
 from models import UserDatabase
 from sqlalchemy import and_
-from flask_jwt_extended import current_user, jwt_required, get_jwt
 from utils import (
     handle_404,
     handle_415,

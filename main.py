@@ -83,15 +83,7 @@ def user_lookup_callback(_jwt_header, jwt_data):
 
 @auth_controller.jwt.additional_claims_loader
 def add_claims_to_access_token(identity):
-    return {
-        "username": identity.username,
-        "email": identity.email,
-        "profile_image": f'{API_URL}{url_for(
-                                    "api user.get_avatar",
-                                    user_id=identity.id,
-                                    profile_name=identity.profile_name,
-                                )}',
-    }
+    return {"is_active": identity.is_active}
 
 
 @auth_controller.jwt.unauthorized_loader
@@ -155,17 +147,6 @@ def revoked_token_callback(jwt_header, jwt_payload):
             }
         ),
         401,
-    )
-
-
-@app.route("/who_am_i", methods=["GET"])
-@jwt_required()
-async def protected():
-    claims = get_jwt()
-    print(claims)
-    return jsonify(
-        id=current_user.id,
-        username=current_user.username,
     )
 
 

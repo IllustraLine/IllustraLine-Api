@@ -35,6 +35,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = POSTGRESQL_URL
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
 app.config["JWT_SECRET_KEY"] = SECRET_KEY
+app.config['SECRET_KEY'] = SECRET_KEY
 
 
 google_oauth_controller.google_oauth.init_app(app)

@@ -1,4 +1,12 @@
-from utils import UserNotFound, Validator, EmailNotValid, Validator, EmailAlreadySend, ResetPassword, AccountActive
+from utils import (
+    UserNotFound,
+    Validator,
+    EmailNotValid,
+    Validator,
+    EmailAlreadySend,
+    ResetPassword,
+    AccountActive,
+)
 from config import API_URL
 from flask_jwt_extended import create_access_token, create_refresh_token
 from flask_jwt_extended import JWTManager
@@ -215,7 +223,8 @@ class AuthController:
                     return render_template(
                         "reset_password.html",
                         password_error="password not secure",
-                        confirm_password_error="password not secure",token=token
+                        confirm_password_error="password not secure",
+                        token=token,
                     )
                 else:
                     updated_at = datetime.datetime.now(
@@ -237,7 +246,8 @@ class AuthController:
             return render_template(
                 "reset_password.html",
                 password_error=password_error,
-                confirm_password_error=confirm_password_error,token=token
+                confirm_password_error=confirm_password_error,
+                token=token,
             )
         if valid_token:
             try:
@@ -485,9 +495,9 @@ class AuthController:
                     {
                         "success": False,
                         "status_code": 400,
-                        "message": 'input invalid',
+                        "message": "input invalid",
                         "data": {"email": email, "password": password},
-                        'errors': errors,
+                        "errors": errors,
                     }
                 ),
                 400,
@@ -500,9 +510,9 @@ class AuthController:
                     {
                         "success": False,
                         "status_code": 404,
-                        "message": 'user not found',
+                        "message": "user not found",
                         "data": {"email": email, "password": password},
-                        'errors': None
+                        "errors": None,
                     }
                 ),
                 404,
@@ -514,7 +524,7 @@ class AuthController:
                         {
                             "success": False,
                             "status_code": 400,
-                            "message": 'user is not active',
+                            "message": "user is not active",
                             "data": {
                                 "email": email,
                                 "username": user.username,
@@ -530,23 +540,37 @@ class AuthController:
                                     profile_name=user.profile_name,
                                 )}',
                             },
-                            'errors': None
+                            "errors": None,
                         }
                     ),
                     400,
                 )
             try:
                 if self.bcrypt.check_password_hash(user.password, password):
-                    access_token = create_access_token(identity=user.id, additional_claims={"username": user.username, "profile_image": f'{API_URL}{url_for(
+                    access_token = create_access_token(
+                        identity=user.id,
+                        additional_claims={
+                            "username": user.username,
+                            "email": user.email,
+                            "profile_image": f'{API_URL}{url_for(
                                     "api user.get_avatar",
                                     user_id=user.id,
                                     profile_name=user.profile_name,
-                                )}'})
-                    refresh_token = create_refresh_token(identity=user.id, additional_claims={"username": user.username, "profile_image": f'{API_URL}{url_for(
+                                )}',
+                        },
+                    )
+                    refresh_token = create_refresh_token(
+                        identity=user.id,
+                        additional_claims={
+                            "username": user.username,
+                            "email": user.email,
+                            "profile_image": f'{API_URL}{url_for(
                                     "api user.get_avatar",
                                     user_id=user.id,
                                     profile_name=user.profile_name,
-                                )}'})
+                                )}',
+                        },
+                    )
                     return (
                         jsonify(
                             {
@@ -581,9 +605,9 @@ class AuthController:
                         {
                             "success": False,
                             "status_code": 404,
-                            "message": 'user not found',
+                            "message": "user not found",
                             "data": {"email": email, "password": password},
-                            'errors': None
+                            "errors": None,
                         }
                     ),
                     404,
@@ -596,7 +620,7 @@ class AuthController:
                             "status_code": 404,
                             "message": "user not found",
                             "data": {"email": email, "password": password},
-                            'errors': None
+                            "errors": None,
                         }
                     ),
                     404,

@@ -94,6 +94,70 @@ def add_claims_to_access_token(identity):
     }
 
 
+@auth_controller.jwt.unauthorized_loader
+def unauthorized_response(callback):
+    return (
+        jsonify(
+            {
+                "success": False,
+                "status_code": 401,
+                "message": "missing authorization header",
+                "data": None,
+                "errors": None,
+            }
+        ),
+        401,
+    )
+
+
+@auth_controller.jwt.expired_token_loader
+def expired_token_callback(jwt_header, jwt_payload):
+    return (
+        jsonify(
+            {
+                "success": False,
+                "status_code": 401,
+                "message": "token has expired",
+                "data": None,
+                "errors": None,
+            }
+        ),
+        401,
+    )
+
+
+@auth_controller.jwt.invalid_token_loader
+def invalid_token_callback(error):
+    return (
+        jsonify(
+            {
+                "success": False,
+                "status_code": 422,
+                "message": "invalid token",
+                "data": None,
+                "errors": None,
+            }
+        ),
+        422,
+    )
+
+
+@auth_controller.jwt.revoked_token_loader
+def revoked_token_callback(jwt_header, jwt_payload):
+    return (
+        jsonify(
+            {
+                "success": False,
+                "status_code": 401,
+                "message": "token has been revoked",
+                "data": None,
+                "errors": None,
+            }
+        ),
+        401,
+    )
+
+
 @app.route("/who_am_i", methods=["GET"])
 @jwt_required()
 async def protected():

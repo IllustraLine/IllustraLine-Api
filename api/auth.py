@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from controllers import AuthController
 from flask_jwt_extended import jwt_required
 
-auth_router = Blueprint("api user login", __name__)
+auth_router = Blueprint("api auth", __name__)
 auth_controller = AuthController()
 
 

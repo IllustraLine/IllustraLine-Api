@@ -14,7 +14,7 @@ from flask_jwt_extended import (
     get_jwt_identity,
 )
 from flask_jwt_extended import JWTManager
-from database import UserCRUD
+from database import UserCRUD, AccountActiveCRUD, ResetPasswordCRUD
 from flask_bcrypt import Bcrypt
 from flask import jsonify, url_for, request, redirect, render_template
 from sqlalchemy.exc import IntegrityError
@@ -37,6 +37,8 @@ class AuthController:
         self.user_database = UserCRUD()
         self.bcrypt = Bcrypt()
         self.jwt = JWTManager()
+        self.account_active_database = AccountActiveCRUD()
+        self.reset_password_database = ResetPasswordCRUD()
 
     async def refresh_token(self):
         identity = get_jwt_identity()
@@ -133,7 +135,7 @@ class AuthController:
                     f"""<h1>Hi, Welcome {email}</h1>
 
     <p>Di Sini Kami Telah Mengirimkan Anda Untuk Verif Account: </p>
-    <a href={API_URL}/illustra-line/v1/user/email-verify/{token}>Click Ini Untuk Verify Email</a>
+    <a href={API_URL}{url_for("api auth.account_active", token=token)}>Click Ini Untuk Verify Email</a>
     """,
                     "html",
                 )
@@ -175,7 +177,9 @@ class AuthController:
                                     "email": email,
                                     "user_id": user.id,
                                     "username": user.username,
-                                    "link": f"{API_URL}/illustra-line/v1/user/email-verify/{token}",
+                                    "link": f"{API_URL}{url_for(
+                                    "api auth.account_active", token=token
+                                )}",
                                 },
                                 "errors": None,
                             }
@@ -259,7 +263,7 @@ class AuthController:
                         new_password=hashed_password,
                         updated_at=updated_at,
                     )
-                    await self.token_database.delete(
+                    await self.reset_password_database.delete(
                         "user_id", user_id=user_change_password.id
                     )
                     return redirect(EZLINK_URL)
@@ -271,11 +275,13 @@ class AuthController:
             )
         if valid_token:
             try:
-                user_token_database = await self.token_database.get(
+                user_token_database = await self.reset_password_database.get(
                     "token", user_id=valid_token["user_id"], token=token
                 )
             except:
-                await self.token_database.delete("email", email=valid_token["email"])
+                await self.reset_password_database.delete(
+                    "email", email=valid_token["email"]
+                )
             else:
                 return render_template("reset_password.html", token=token)
         return "Invalid token"
@@ -329,7 +335,7 @@ class AuthController:
         created_at = datetime.datetime.now(datetime.timezone.utc).timestamp()
         expired_at = created_at + (datetime.timedelta(hours=7).total_seconds())
         try:
-            user = await self.token_database.insert(
+            user = await self.reset_password_database.insert(
                 user_email.id, token, created_at, expired_at
             )
         except EmailAlreadySend:
@@ -350,7 +356,7 @@ class AuthController:
                 f"""<h1>Hi, Welcome {email}</h1>
 
     <p>Di Sini Kami Telah Mengirimkan Anda Untuk Merubah Password Anda: </p>
-    <a href={API_URL}/illustra-line/v1/user/reset/reset-password/{token}>Click Ini Untuk Reset Password</a>
+    <a href={API_URL}{url_for("api auth.reset_password", token=token)}>Click Ini Untuk Reset Password</a>
     """,
                 "html",
             )
@@ -392,7 +398,7 @@ class AuthController:
                                 "user_id": user.id,
                                 "username": user_email.username,
                                 "link": f'{API_URL}{url_for(
-                                    "route reset password.reset_password", token=token
+                                    "api auth.reset_password", token=token
                                 )}',
                             },
                             "errors": None,

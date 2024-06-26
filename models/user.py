@@ -11,7 +11,6 @@ from database import Base
 from sqlalchemy.orm import relationship
 from PIL import Image
 import io
-import datetime
 from utils import Validator
 
 

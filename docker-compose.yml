@@ -2,18 +2,15 @@ version: '3'
 
 services:
   web:
-    image: nexblu/illustra-line-api
+    image: nexblu/illustra-line-api:24.7.9
     ports:
       - "5000"
-    environment:
-      - FLASK_APP=main.py
-      - FLASK_RUN_HOST=0.0.0.0
-      - FLASK_DEBUG=1
-      - FLASK_ENV=development
     depends_on:
       - db
-    volumes:
-      - .:/app
+    environment:
+      - FLASK_APP=main.py
+      - FLASK_DEBUG=1
+      - POSTGRESQL_URL=postgresql://postgres:postgres@db/IllustraLine
 
   db:
     image: postgres:latest

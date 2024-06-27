@@ -1,15 +1,11 @@
-FROM python:latest
+FROM python 
 
-WORKDIR /app 
+WORKDIR /app
 
-COPY requirements.txt requirements.txt
+COPY requirements.txt /app/
+
 RUN pip install -r requirements.txt
 
-
-COPY . .
-
-ENV POSTGRESQL_URL=postgresql://postgres:postgres@db:5432/IllustraLine
-
-EXPOSE 5000
+COPY . /app/
 
 CMD ["flask", "run"]

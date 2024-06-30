@@ -14,7 +14,7 @@ from flask_jwt_extended import (
     get_jwt_identity,
     JWTManager,
 )
-from database import UserCRUD, AccountActiveCRUD, ResetPasswordCRUD
+from database import UserCRUD, AccountActiveCRUD, ResetPasswordCRUD, BlackListTokenCRUD
 from flask_bcrypt import Bcrypt
 from flask import jsonify, url_for, request, redirect, render_template
 from sqlalchemy.exc import IntegrityError
@@ -39,6 +39,37 @@ class AuthController:
         self.jwt = JWTManager()
         self.account_active_database = AccountActiveCRUD()
         self.reset_password_database = ResetPasswordCRUD()
+        self.blacklist_token_database = BlackListTokenCRUD()
+
+    async def logout(self, jti):
+        try:
+            await self.blacklist_token_database.create(jti)
+        except:
+            return (
+                jsonify(
+                    {
+                        "success": False,
+                        "status_code": 400,
+                        "message": "invalid token",
+                        "data": None,
+                        "errors": None,
+                    }
+                ),
+                400,
+            )
+        else:
+            return (
+                jsonify(
+                    {
+                        "success": True,
+                        "status_code": 201,
+                        "message": "logout success",
+                        "data": None,
+                        "errors": None,
+                    }
+                ),
+                201,
+            )
 
     async def refresh_token(self):
         identity = get_jwt_identity()

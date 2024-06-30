@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from controllers import AuthController
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt
 
 auth_router = Blueprint("api auth", __name__)
 auth_controller = AuthController()
@@ -55,3 +55,10 @@ async def register():
     password = data.get("password")
     confirm_password = data.get("confirm_password")
     return await auth_controller.register(username, email, password, confirm_password)
+
+
+@auth_router.post("/illustra-line/v1/auth/logout")
+@jwt_required()
+async def logout():
+    data = get_jwt()["jti"]
+    return await auth_controller.logout(data)

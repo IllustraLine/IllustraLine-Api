@@ -1,6 +1,7 @@
 import re
-from .custom_exception import EmailNotValid
+from .custom_exception import EmailNotValid, InvalidTags
 from email_validator import validate_email, EmailNotValidError
+from .miscellaneous import Miscellaneous
 
 
 class Validator:
@@ -65,3 +66,37 @@ class Validator:
         except EmailNotValidError as e:
             raise EmailNotValid
         return email
+
+    @staticmethod
+    async def valid_tags(tags):
+        valid_tags = []
+        for tag in tags:
+            cleaned_tag = tag.strip()
+            if len(cleaned_tag) >= 3:
+                valid_tags.append(cleaned_tag)
+        if len(valid_tags) == 0:
+            return {"valid": False, "tags": None}
+        return {"valid": True, "tags": valid_tags}
+
+    @classmethod
+    async def valid_input_add_course(
+        cls, title, description, artist, category, tags, image, price
+    ):
+        errors = {}
+        if not (valid_tags := await cls.valid_tags(tags))["valid"]:
+            errors["tags"] = "tags is empety"
+        if not title or title.isspace():
+            errors["title"] = "title is empety"
+        if not description or description.isspace():
+            errors["description"] = "description is empety"
+        if not artist or artist.isspace():
+            errors["artist"] = "artist is empety"
+        if not category or category.isspace():
+            errors["category"] = "category is empety"
+        if not image:
+            errors["image"] = "image is empety"
+        return errors
+
+    @staticmethod
+    async def validate_image(image):
+        pass

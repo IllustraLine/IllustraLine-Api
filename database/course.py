@@ -3,7 +3,7 @@ from .config import db_session, init_db
 from models import CourseDatabase, AdminCourseDatabase, UserDatabase
 import datetime
 from sqlalchemy import desc, and_
-from utils import UserNotFound, ImageNotFound, CourseNotFound
+from utils import UserNotFound, ImageNotFound, CourseNotFound, Miscellaneous
 
 
 class CourseCRUD(Database):
@@ -76,4 +76,11 @@ class CourseCRUD(Database):
                 .first()
             ):
                 return data
+            raise CourseNotFound
+        elif category == "search_title":
+            if data := (
+                CourseDatabase.query.order_by(desc(CourseDatabase.created_at)).all()
+            ):
+                if result := await Miscellaneous.search_course_by_title(title, data):
+                    return result
             raise CourseNotFound

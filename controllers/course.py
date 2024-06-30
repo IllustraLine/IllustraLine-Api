@@ -10,6 +10,53 @@ class CourseController:
     def __init__(self) -> None:
         self.course_database = CourseCRUD()
 
+    async def search_course(self, user, course_title):
+        if not user:
+            try:
+                result = await self.course_database.get(
+                    "search_title", title=course_title
+                )
+            except:
+                return (
+                    jsonify(
+                        {
+                            "success": False,
+                            "status_code": 404,
+                            "message": "course not found",
+                            "data": {"course_title": course_title},
+                            "errors": None,
+                        }
+                    ),
+                    404,
+                )
+            return (
+                jsonify(
+                    {
+                        "success": True,
+                        "status_code": 200,
+                        "message": "success get course",
+                        "data": [
+                            {
+                                "course_id": data.id,
+                                "title": data.title,
+                                "description": data.description,
+                                "artist": data.artist,
+                                "category": data.category,
+                                "tags": data.tags,
+                                "price": data.price,
+                                "created_at": data.created_at,
+                                "updated_at": data.updated_at,
+                                "is_active": data.is_active,
+                                "image_url": f"{API_URL}{url_for('api course.get_image_course', course_id=data.id, course_title=data.title)}",
+                            }
+                            for data in result
+                        ],
+                        "errors": None,
+                    }
+                ),
+                200,
+            )
+
     async def get_course_by_id(self, user, course_id):
         if not user:
             try:

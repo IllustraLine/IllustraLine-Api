@@ -89,7 +89,7 @@ def add_claims_to_access_token(identity):
     return {"is_active": identity.is_active}
 
 
-@auth_controller.jwt.token_in_blacklist_loader
+@auth_controller.jwt.token_in_blocklist_loader
 def check_if_token_revoked(jwt_header, jwt_payload):
     jti = jwt_payload["jti"]
     return BlackListTokenDatabase.query.filter(

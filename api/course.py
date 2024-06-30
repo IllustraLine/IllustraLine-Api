@@ -6,6 +6,12 @@ course_router = Blueprint("api course", __name__)
 course_controller = CourseController()
 
 
+@course_router.get("/illustra-line/v1/course/<string:course_title>")
+@jwt_required(optional=True)
+async def search_course(course_title):
+    return await course_controller.search_course(current_user, course_title)
+
+
 @course_router.get("/illustra-line/v1/course/<int:course_id>/<string:course_title>")
 async def get_image_course(course_id, course_title):
     return await course_controller.get_course_image(course_id, course_title)
